@@ -90,15 +90,22 @@ static esp_err_t write_cb(const esp_rmaker_device_t *device, const esp_rmaker_pa
         ESP_LOGI(TAG, "Received value = %s for %s - %s",
                 val.val.b? "true" : "false", device_name, param_name);
         app_light_set_power(val.val.b);
-    } else if (strcmp(param_name, ESP_RMAKER_DEF_BRIGHTNESS_NAME) == 0) {
+    }
+#if APP_FEATURE_BRIGHTNESS
+    else if (strcmp(param_name, ESP_RMAKER_DEF_BRIGHTNESS_NAME) == 0) {
         ESP_LOGI(TAG, "Received value = %d for %s - %s",
                 val.val.i, device_name, param_name);
         app_light_set_brightness(val.val.i);
-    } else if (strcmp(param_name, ESP_RMAKER_DEF_HUE_NAME) == 0) {
+    }
+#endif
+#if APP_FEATURE_HUE
+    else if (strcmp(param_name, ESP_RMAKER_DEF_HUE_NAME) == 0) {
         ESP_LOGI(TAG, "Received value = %d for %s - %s",
                 val.val.i, device_name, param_name);
         app_light_set_hue(val.val.i);
-    } else if (strcmp(param_name, ESP_RMAKER_DEF_SATURATION_NAME) == 0) {
+    }
+#endif
+    else if (strcmp(param_name, ESP_RMAKER_DEF_SATURATION_NAME) == 0) {
         ESP_LOGI(TAG, "Received value = %d for %s - %s",
                 val.val.i, device_name, param_name);
         app_light_set_saturation(val.val.i);
@@ -138,6 +145,9 @@ void app_main()
      */
     ESP_LOGI(TAG, "Application driver initialization");
     app_driver_init();
+    ESP_LOGI(TAG, "OTA demo features: Brightness=%s, Hue=%s",
+            APP_FEATURE_BRIGHTNESS ? "enabled" : "removed",
+            APP_FEATURE_HUE ? "enabled" : "removed");
 
     /**
      * @brief Initialize Wi-Fi. Note that, this should be called before esp_rmaker_init()
@@ -165,8 +175,14 @@ void app_main()
     light_device = esp_rmaker_lightbulb_device_create("Light", NULL, DEFAULT_POWER);
     esp_rmaker_device_add_cb(light_device, write_cb, NULL);
 
-    esp_rmaker_device_add_param(light_device, esp_rmaker_brightness_param_create(ESP_RMAKER_DEF_BRIGHTNESS_NAME, DEFAULT_BRIGHTNESS));
-    esp_rmaker_device_add_param(light_device, esp_rmaker_hue_param_create(ESP_RMAKER_DEF_HUE_NAME, DEFAULT_HUE));
+#if APP_FEATURE_BRIGHTNESS
+    esp_rmaker_device_add_param(light_device,
+            esp_rmaker_brightness_param_create(ESP_RMAKER_DEF_BRIGHTNESS_NAME, DEFAULT_BRIGHTNESS));
+#endif
+#if APP_FEATURE_HUE
+    esp_rmaker_device_add_param(light_device,
+            esp_rmaker_hue_param_create(ESP_RMAKER_DEF_HUE_NAME, DEFAULT_HUE));
+#endif
     esp_rmaker_device_add_param(light_device, esp_rmaker_saturation_param_create(ESP_RMAKER_DEF_SATURATION_NAME, DEFAULT_SATURATION));
 
     esp_rmaker_node_add_device(node, light_device);

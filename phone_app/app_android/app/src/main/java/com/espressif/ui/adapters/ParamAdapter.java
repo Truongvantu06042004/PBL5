@@ -23,7 +23,6 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -52,14 +51,13 @@ import com.espressif.ui.models.Device;
 import com.espressif.ui.models.Param;
 import com.espressif.ui.widgets.EspDropDown;
 import com.espressif.ui.widgets.PaletteBar;
+import com.google.android.material.button.MaterialButton;
 import com.google.gson.JsonObject;
 import com.larswerkman.holocolorpicker.ColorPicker;
-import com.warkiz.tickseekbar.OnSeekChangeListener;
-import com.warkiz.tickseekbar.SeekParams;
-import com.warkiz.tickseekbar.TickSeekBar;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 
 public class ParamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -529,174 +527,81 @@ public class ParamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             paramViewHolder.ivSliderEnd.setVisibility(View.GONE);
         }
 
-        if (dataType.equalsIgnoreCase("int") || dataType.equalsIgnoreCase("integer")) {
+        final boolean integerValue = dataType.equalsIgnoreCase("int") || dataType.equalsIgnoreCase("integer");
+        final double currentValue = Math.max(min, Math.min(max, sliderValue));
+        final double step = integerValue
+                ? Math.max(1, Math.round((max - min) / 10.0f))
+                : Math.max(0.1, (max - min) / 10.0f);
+        final boolean canWrite = param.getProperties().contains(AppConstants.KEY_PROPERTY_WRITE)
+                && ((EspDeviceActivity) context).isNodeOnline();
 
-            paramViewHolder.intSlider.setVisibility(View.VISIBLE);
-            paramViewHolder.floatSlider.setVisibility(View.GONE);
+        paramViewHolder.tvParamValue.setText(formatSliderValue(currentValue, integerValue));
+        paramViewHolder.btnDecrease.setEnabled(canWrite);
+        paramViewHolder.btnIncrease.setEnabled(canWrite);
+        paramViewHolder.btnDecrease.setOnClickListener(null);
+        paramViewHolder.btnIncrease.setOnClickListener(null);
 
-            paramViewHolder.intSlider.setMax(max);
-            paramViewHolder.intSlider.setMin(min);
-            paramViewHolder.intSlider.setTickCount(2);
-
-            if (sliderValue < min) {
-
-                paramViewHolder.intSlider.setProgress(min);
-
-            } else if (sliderValue > max) {
-
-                paramViewHolder.intSlider.setProgress(max);
-
-            } else {
-                paramViewHolder.intSlider.setProgress((int) sliderValue);
-            }
-
-            if (param.getProperties().contains(AppConstants.KEY_PROPERTY_WRITE)) {
-
-                if (((EspDeviceActivity) context).isNodeOnline()) {
-
-                    paramViewHolder.intSlider.setEnabled(true);
-
-                    paramViewHolder.intSlider.setOnSeekChangeListener(new OnSeekChangeListener() {
-
-                        @Override
-                        public void onSeeking(SeekParams seekParams) {
-                        }
-
-                        @Override
-                        public void onStartTrackingTouch(TickSeekBar seekBar) {
-                            ((EspDeviceActivity) context).stopUpdateValueTask();
-                        }
-
-                        @Override
-                        public void onStopTrackingTouch(TickSeekBar seekBar) {
-
-                            int progress = seekBar.getProgress();
-                            int finalProgress = progress;
-
-                            JsonObject jsonParam = new JsonObject();
-                            JsonObject body = new JsonObject();
-
-                            jsonParam.addProperty(param.getName(), finalProgress);
-                            body.add(deviceName, jsonParam);
-
-                            networkApiManager.updateParamValue(nodeId, body, new ApiResponseListener() {
-
-                                @Override
-                                public void onSuccess(Bundle data) {
-                                    ((EspDeviceActivity) context).startUpdateValueTask();
-                                }
-
-                                @Override
-                                public void onResponseFailure(Exception exception) {
-                                    ((EspDeviceActivity) context).startUpdateValueTask();
-                                }
-
-                                @Override
-                                public void onNetworkFailure(Exception exception) {
-                                    ((EspDeviceActivity) context).startUpdateValueTask();
-                                }
-                            });
-                        }
-                    });
-
-                } else {
-
-                    paramViewHolder.intSlider.setEnabled(false);
+        if (canWrite) {
+            paramViewHolder.btnDecrease.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    double baseValue = Math.max(min, Math.min(max, param.getValue()));
+                    double newValue = Math.max(min, baseValue - step);
+                    applySliderValue(paramViewHolder, param, newValue, integerValue);
                 }
+            });
 
-            } else {
-
-                paramViewHolder.intSlider.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return true;
-                    }
-                });
-            }
-        } else {
-
-            paramViewHolder.intSlider.setVisibility(View.GONE);
-            paramViewHolder.floatSlider.setVisibility(View.VISIBLE);
-
-            paramViewHolder.floatSlider.setMax(max);
-            paramViewHolder.floatSlider.setMin(min);
-            paramViewHolder.floatSlider.setTickCount(2);
-
-            if (sliderValue < min) {
-
-                paramViewHolder.floatSlider.setProgress(min);
-
-            } else if (sliderValue > max) {
-
-                paramViewHolder.floatSlider.setProgress(max);
-
-            } else {
-                paramViewHolder.floatSlider.setProgress((float) sliderValue);
-            }
-
-            if (param.getProperties().contains(AppConstants.KEY_PROPERTY_WRITE)) {
-
-                if (((EspDeviceActivity) context).isNodeOnline()) {
-
-                    paramViewHolder.floatSlider.setEnabled(true);
-
-                    paramViewHolder.floatSlider.setOnSeekChangeListener(new OnSeekChangeListener() {
-
-                        @Override
-                        public void onSeeking(SeekParams seekParams) {
-                        }
-
-                        @Override
-                        public void onStartTrackingTouch(TickSeekBar seekBar) {
-                            ((EspDeviceActivity) context).stopUpdateValueTask();
-                        }
-
-                        @Override
-                        public void onStopTrackingTouch(TickSeekBar seekBar) {
-
-                            float progress = seekBar.getProgressFloat();
-                            float finalProgress = progress;
-
-                            JsonObject jsonParam = new JsonObject();
-                            JsonObject body = new JsonObject();
-
-                            jsonParam.addProperty(param.getName(), finalProgress);
-                            body.add(deviceName, jsonParam);
-
-                            networkApiManager.updateParamValue(nodeId, body, new ApiResponseListener() {
-
-                                @Override
-                                public void onSuccess(Bundle data) {
-                                    ((EspDeviceActivity) context).startUpdateValueTask();
-                                }
-
-                                @Override
-                                public void onResponseFailure(Exception exception) {
-                                    ((EspDeviceActivity) context).startUpdateValueTask();
-                                }
-
-                                @Override
-                                public void onNetworkFailure(Exception exception) {
-                                    ((EspDeviceActivity) context).startUpdateValueTask();
-                                }
-                            });
-                        }
-                    });
-
-                } else {
-                    paramViewHolder.floatSlider.setEnabled(false);
+            paramViewHolder.btnIncrease.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    double baseValue = Math.max(min, Math.min(max, param.getValue()));
+                    double newValue = Math.min(max, baseValue + step);
+                    applySliderValue(paramViewHolder, param, newValue, integerValue);
                 }
-
-            } else {
-
-                paramViewHolder.floatSlider.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return true;
-                    }
-                });
-            }
+            });
         }
+    }
+
+    private String formatSliderValue(double value, boolean integerValue) {
+        if (integerValue) {
+            return String.valueOf((int) Math.round(value));
+        }
+        return String.format(Locale.getDefault(), "%.1f", value);
+    }
+
+    private void applySliderValue(final ParamViewHolder paramViewHolder, final Param param,
+                                  double value, boolean integerValue) {
+        final Number finalValue;
+        if (integerValue) {
+            finalValue = Integer.valueOf((int) Math.round(value));
+        } else {
+            finalValue = Float.valueOf((float) value);
+        }
+        param.setValue(finalValue.doubleValue());
+        paramViewHolder.tvParamValue.setText(formatSliderValue(value, integerValue));
+        ((EspDeviceActivity) context).stopUpdateValueTask();
+
+        JsonObject jsonParam = new JsonObject();
+        JsonObject body = new JsonObject();
+        jsonParam.addProperty(param.getName(), finalValue);
+        body.add(deviceName, jsonParam);
+
+        networkApiManager.updateParamValue(nodeId, body, new ApiResponseListener() {
+            @Override
+            public void onSuccess(Bundle data) {
+                ((EspDeviceActivity) context).startUpdateValueTask();
+            }
+
+            @Override
+            public void onResponseFailure(Exception exception) {
+                ((EspDeviceActivity) context).startUpdateValueTask();
+            }
+
+            @Override
+            public void onNetworkFailure(Exception exception) {
+                ((EspDeviceActivity) context).startUpdateValueTask();
+            }
+        });
     }
 
     private void displayToggle(final ParamViewHolder paramViewHolder, final Param param) {
@@ -1480,10 +1385,10 @@ public class ParamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     static class ParamViewHolder extends RecyclerView.ViewHolder {
 
         ImageView ivSliderStart, ivSliderEnd;
-        TickSeekBar intSlider, floatSlider;
+        MaterialButton btnDecrease, btnIncrease;
         SwitchCompat toggleSwitch;
         TextView tvSliderName, tvSwitchName, tvSwitchStatus, tvLabelName, tvLabelValue, tvLabelPalette,
-                tvSpinnerName, tvSpinnerValue, tvTriggerName;
+                tvSpinnerName, tvSpinnerValue, tvTriggerName, tvParamValue;
         RelativeLayout rlUiTypeSlider, rlUiTypeSwitch, rlUiTypeLabel, rlPalette, rlUiTypeDropDown, rlUiTypeTrigger;
         TextView btnEdit;
         ContentLoadingProgressBar progressBar, progressBarSpinner;
@@ -1496,8 +1401,9 @@ public class ParamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
             ivSliderStart = itemView.findViewById(R.id.iv_slider_start);
             ivSliderEnd = itemView.findViewById(R.id.iv_slider_end);
-            intSlider = itemView.findViewById(R.id.card_int_slider);
-            floatSlider = itemView.findViewById(R.id.card_float_slider);
+            btnDecrease = itemView.findViewById(R.id.btn_param_decrease);
+            btnIncrease = itemView.findViewById(R.id.btn_param_increase);
+            tvParamValue = itemView.findViewById(R.id.tv_param_value);
             toggleSwitch = itemView.findViewById(R.id.card_switch);
             tvSliderName = itemView.findViewById(R.id.slider_name);
             tvSwitchName = itemView.findViewById(R.id.switch_name);

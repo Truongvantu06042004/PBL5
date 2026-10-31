@@ -11,3 +11,5 @@ idf_component_register(SRCS "${srcs}"
                              esp_driver_rmt esp_driver_gpio esp_https_ota console)
 
 idf_build_set_property(COMPILE_DEFINITIONS "-DDEVELOPMENT_BOARD=\"${DEVELOPMENT_BOARD}\"" APPEND)
+idf_build_set_property(COMPILE_DEFINITIONS "-DAPP_FEATURE_BRIGHTNESS=${APP_FEATURE_BRIGHTNESS}" APPEND)
+idf_build_set_property(COMPILE_DEFINITIONS "-DAPP_FEATURE_HUE=${APP_FEATURE_HUE}" APPEND)

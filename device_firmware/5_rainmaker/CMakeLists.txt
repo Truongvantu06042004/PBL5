@@ -34,4 +34,24 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 # Increment this before creating each OTA image (for example: 1.0.0 -> 1.0.1).
 # RainMaker rejects a cloud OTA image with the same version as the running one.
 set(PROJECT_VER "1.0.0")
+
+# OTA classroom demo feature matrix:
+#   1.0.0: Power, Brightness, Hue and Saturation are available.
+#   1.0.1: Brightness is intentionally removed.
+#   1.0.2: Brightness returns, while Hue is intentionally removed.
+# Keep these feature flags tied to the firmware version so each OTA image has
+# a clearly demonstrable difference in the RainMaker app.
+if(PROJECT_VER VERSION_EQUAL "1.0.0")
+    set(APP_FEATURE_BRIGHTNESS 1)
+    set(APP_FEATURE_HUE 1)
+elseif(PROJECT_VER VERSION_EQUAL "1.0.1")
+    set(APP_FEATURE_BRIGHTNESS 0)
+    set(APP_FEATURE_HUE 1)
+elseif(PROJECT_VER VERSION_EQUAL "1.0.2")
+    set(APP_FEATURE_BRIGHTNESS 1)
+    set(APP_FEATURE_HUE 0)
+else()
+    message(FATAL_ERROR "Unsupported OTA demo version: ${PROJECT_VER}. Use 1.0.0, 1.0.1, or 1.0.2.")
+endif()
+
 project(5_rainmaker)
