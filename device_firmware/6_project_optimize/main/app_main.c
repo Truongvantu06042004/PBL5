@@ -126,10 +126,7 @@ void app_main()
     esp_rmaker_node_add_device(node, light_device);
 
     /* Enable OTA */
-    esp_rmaker_ota_config_t ota_config = {
-        .server_cert = ota_server_cert,
-    };
-    esp_rmaker_ota_enable(&ota_config, OTA_USING_PARAMS);
+    ESP_ERROR_CHECK(esp_rmaker_ota_enable_default());
 
     /* Enable timezone service which will be require for setting appropriate timezone
      * from the phone apps for scheduling to work correctly.

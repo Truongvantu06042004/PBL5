@@ -23,13 +23,12 @@
                 android:gravity="center_vertical"
                 android:padding="12dp">
 
-                <ImageView
+                <include
                     android:id="@+id/iv_title"
+                    layout="@layout/view_tvt_brand_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_title_rainmaker" />
+                    android:layout_centerInParent="true" />
 
             </RelativeLayout>
 

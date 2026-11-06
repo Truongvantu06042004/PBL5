@@ -29,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -51,7 +52,6 @@ import com.espressif.ui.models.Device;
 import com.espressif.ui.models.Param;
 import com.espressif.ui.widgets.EspDropDown;
 import com.espressif.ui.widgets.PaletteBar;
-import com.google.android.material.button.MaterialButton;
 import com.google.gson.JsonObject;
 import com.larswerkman.holocolorpicker.ColorPicker;
 
@@ -1385,7 +1385,7 @@ public class ParamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     static class ParamViewHolder extends RecyclerView.ViewHolder {
 
         ImageView ivSliderStart, ivSliderEnd;
-        MaterialButton btnDecrease, btnIncrease;
+        ImageButton btnDecrease, btnIncrease;
         SwitchCompat toggleSwitch;
         TextView tvSliderName, tvSwitchName, tvSwitchStatus, tvLabelName, tvLabelValue, tvLabelPalette,
                 tvSpinnerName, tvSpinnerValue, tvTriggerName, tvParamValue;

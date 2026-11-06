@@ -121,7 +121,11 @@
     <string name="Password">Password</string>
     <string name="Menu">Menu</string>
     <string name="app_main_desc">A sample app to showcase Cognito Identity and the SDK for Android.</string>
-    <string name="powered_by_esp">Powered by ESPRESSIF</string>
+    <string name="brand_name">TVT RAINMAKER</string>
+    <string name="brand_logo_description">TVT RainMaker logo</string>
+    <string name="decrease_value">Decrease value</string>
+    <string name="increase_value">Increase value</string>
+    <string name="powered_by_esp">TVT RainMaker · IoT Lighting Control</string>
     <string name="no_devices">No devices added</string>
     <string name="no_schedules">No Schedules added</string>
     <string name="no_scenes">No Scenes added</string>

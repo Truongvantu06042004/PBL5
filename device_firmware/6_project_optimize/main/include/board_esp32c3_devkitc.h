@@ -19,15 +19,13 @@
 #define LIGHT_BUTTON_ACTIVE_LEVEL  0
 
 /**
- * @brief Light driver Macro
+ * WS2812 / NeoPixel configuration.
+ *
+ * A WS2812 has one serial data input, unlike the former discrete RGB LED
+ * which used three PWM GPIOs. All LEDs in the strip show the same colour
+ * selected from the RainMaker application.
  */
-#define LIGHT_GPIO_RED          3
-#define LIGHT_GPIO_GREEN        4
-#define LIGHT_GPIO_BLUE         5
-#define LIGHT_GPIO_COLD         7
-#define LIGHT_GPIO_WARM         10
-#define LIGHT_FADE_PERIOD_MS    100     /**< The time from the current state to the next state */
-#define LIGHT_BLINK_PERIOD_MS   1500    /**< Period of blinking lights */
-#define LIGHT_FREQ_HZ           5000    /**< frequency of ledc signal */
+#define WS2812_DATA_GPIO        3
+#define WS2812_LED_COUNT        8
 
 #endif /**< __BOARD_ESP32C3_DEVKITC_H__ */

@@ -1,11 +1,13 @@
 set(srcs "app_main.c"
                     "app_pm.c"
-                    "app_driver.c")
+                    "app_driver.c"
+                    "ws2812_driver.c")
 set(include_dirs "include")
 set(DEVELOPMENT_BOARD "board_esp32c3_devkitc.h")
 
 idf_component_register(SRCS "${srcs}"
-                    INCLUDE_DIRS "${include_dirs}")
+                    INCLUDE_DIRS "${include_dirs}"
+                    REQUIRES esp_rainmaker app_wifi app_storage button esp_pm esp_driver_rmt esp_driver_gpio)
 
 target_add_binary_data(${COMPONENT_TARGET} "server.crt" TEXT)
 

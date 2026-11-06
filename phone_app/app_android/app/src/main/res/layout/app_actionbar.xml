@@ -4,7 +4,7 @@
     android:id="@+id/appbar_layout"
     android:layout_width="match_parent"
     android:layout_height="112dp"
-    android:background="@android:color/transparent"
+    android:background="@drawable/bg_tvt_toolbar"
     android:fitsSystemWindows="true"
     android:theme="@style/AppTheme.AppBarLayout">
 
@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-        app:statusBarScrim="@android:color/transparent">
+        app:statusBarScrim="@color/colorPrimaryDark">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/appbar"
